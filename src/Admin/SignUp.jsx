@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +8,7 @@ const Signup = () => {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,39 +17,44 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
     try {
-      const res = await fetch("http://localhost/food_and_restaurant/signup.php", {
+      const res = await fetch("http://localhost/pharmacy-project/api/signup.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
+
       if (data.success) {
-        setMessage("Signup successful!");
-        setTimeout(() => {
-          navigate("/login"); // redirect to login page after 2 seconds
-        }, 2000);
+        setMessage("✅ Signup successful! Redirecting to Login...");
+        setTimeout(() => navigate("/login"), 1500);
       } else {
-        setMessage(data.message || "Signup failed. Please try again.");
+        setMessage("❌ " + (data.message || "Signup failed"));
       }
     } catch (err) {
-      setMessage("Something went wrong! Make sure PHP server is running.");
+      setMessage("❌ Something went wrong! Make sure XAMPP is running.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-semibold mb-8 text-center text-gray-900">Sign Up</h2>
+        <h2 className="text-2xl font-semibold mb-8 text-center text-gray-900">Create Account</h2>
 
-        <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <input
             type="text"
             name="username"
             placeholder="Username"
+            value={formData.username}
             onChange={handleChange}
-            className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 transition-colors text-gray-900 placeholder-gray-400"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
             required
           />
 
@@ -57,8 +62,9 @@ const Signup = () => {
             type="email"
             name="email"
             placeholder="Email"
+            value={formData.email}
             onChange={handleChange}
-            className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 transition-colors text-gray-900 placeholder-gray-400"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
             required
           />
 
@@ -66,35 +72,26 @@ const Signup = () => {
             type="password"
             name="password"
             placeholder="Password"
+            value={formData.password}
             onChange={handleChange}
-            className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 transition-colors text-gray-900 placeholder-gray-400"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
             required
           />
 
           <button
-            type="button"
-            onClick={handleSubmit}
-            className="w-full bg-gray-900 text-white py-2 rounded-md hover:bg-gray-800 transition-colors duration-200 font-medium"
+            type="submit"
+            disabled={loading}
+            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-md font-semibold disabled:opacity-70"
           >
-            Sign Up
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
-        </div>
+        </form>
 
-        {message && (
-          <p
-            className={`text-center mt-5 text-sm font-medium ${
-              message === "Signup successful!" ? "text-gray-700" : "text-red-500"
-            }`}
-          >
-            {message}
-          </p>
-        )}
+        {message && <p className="text-center mt-4 text-sm font-medium text-green-600">{message}</p>}
 
-        <p className="text-center mt-5 text-sm text-gray-600">
+        <p className="text-center mt-6 text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="/login" className="text-gray-900 hover:underline font-medium">
-            Log in
-          </a>
+          <a href="/login" className="text-emerald-700 hover:underline">Log in</a>
         </p>
       </div>
     </div>
@@ -102,6 +99,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-
-

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +7,7 @@ const Login = () => {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,24 +16,34 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
+
     try {
-      const res = await fetch("http://localhost/food_and_restaurant/login.php", {
+      const res = await fetch("http://localhost/pharmacy-project/api/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
+
       if (data.success) {
-        setMessage("Login successful!");
+        setMessage("✅ Login successful! Redirecting...");
+
+        // Save user info
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         setTimeout(() => {
-          navigate("/admin"); // ✅ FIX: match the route defined in App.jsx
-        }, 2000);
+          navigate("/admin");   // Redirect to Admin Panel
+        }, 1200);
       } else {
-        setMessage(data.message || "Login failed. Please try again.");
+        setMessage("❌ " + (data.message || "Invalid credentials"));
       }
     } catch (err) {
-      setMessage("Something went wrong! Make sure PHP server is running.");
+      setMessage("❌ Something went wrong! Make sure XAMPP is running.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,13 +52,14 @@ const Login = () => {
       <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-sm">
         <h2 className="text-2xl font-semibold mb-8 text-center text-gray-900">Log In</h2>
 
-        <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <input
             type="email"
             name="email"
             placeholder="Email"
+            value={formData.email}
             onChange={handleChange}
-            className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 transition-colors text-gray-900 placeholder-gray-400"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
             required
           />
 
@@ -56,35 +67,26 @@ const Login = () => {
             type="password"
             name="password"
             placeholder="Password"
+            value={formData.password}
             onChange={handleChange}
-            className="w-full p-2.5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 transition-colors text-gray-900 placeholder-gray-400"
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
             required
           />
 
           <button
-            type="button"
-            onClick={handleSubmit}
-            className="w-full bg-gray-900 text-white py-2 rounded-md hover:bg-gray-800 transition-colors duration-200 font-medium"
+            type="submit"
+            disabled={loading}
+            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-md font-semibold disabled:opacity-70"
           >
-            Log In
+            {loading ? "Logging in..." : "Log In"}
           </button>
-        </div>
+        </form>
 
-        {message && (
-          <p
-            className={`text-center mt-5 text-sm font-medium ${
-              message === "Login successful!" ? "text-gray-700" : "text-red-500"
-            }`}
-          >
-            {message}
-          </p>
-        )}
+        {message && <p className="text-center mt-4 text-sm font-medium">{message}</p>}
 
-        <p className="text-center mt-5 text-sm text-gray-600">
+        <p className="text-center mt-6 text-sm text-gray-600">
           Don't have an account?{" "}
-          <a href="/signup" className="text-gray-900 hover:underline font-medium">
-            Sign up
-          </a>
+          <a href="/signup" className="text-emerald-700 hover:underline">Sign up</a>
         </p>
       </div>
     </div>
@@ -92,7 +94,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
-
