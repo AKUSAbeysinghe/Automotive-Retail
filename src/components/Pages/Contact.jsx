@@ -1,203 +1,188 @@
-import React, { useState } from "react";
+// import React from 'react';
+// import ContactInfo from "../Pages/ContactInfo.jsx";
 
-/* ================= ICONS ================= */
+// export default function InstallBayFeature() {
+//   return (
+//     <section className="bg-neutral-950 p-6 sm:p-12 md:p-16 text-white min-h-[500px] flex items-center">
+//       <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+        
+//         {/* Left Side: Image Container */}
+//         <div className="relative aspect-[4/3] sm:aspect-video md:aspect-[4/3] w-full rounded-2xl overflow-hidden group">
+//           <img 
+//             src="https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=1000&auto=format&fit=crop" 
+//             alt="Car interior with ambient led lighting" 
+//             className="w-full h-full object-cover grayscale opacity-80 mix-blend-lighten transition-all duration-500 group-hover:scale-102 group-hover:opacity-90"
+//           />
+//           {/* Subtle color highlight mask mimicking the original ambient light styling */}
+//           <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/10 via-transparent to-red-500/10 pointer-events-none" />
+//         </div>
 
-const PhoneIcon = () => (
-<svg className="w-14 h-14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-<path d="M3 5a2 2 0 012-2h2l2 5-2 1c1 3 3 5 6 6l1-2 5 2v2a2 2 0 01-2 2h-1C9 19 5 15 3 6V5z"
-strokeLinecap="round" strokeLinejoin="round"/>
-</svg>
-);
+//         {/* Right Side: Content Block */}
+//         <div className="space-y-4 md:space-y-6">
+//           {/* Subheading Badge */}
+//           <span className="text-xs font-bold tracking-[0.3em] uppercase text-orange-500 block">
+//             Install Bay
+//           </span>
 
-const MailIcon = () => (
-<svg className="w-14 h-14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-<path d="M4 4h16v16H4V4z" />
-<path d="M4 6l8 6 8-6" strokeLinecap="round" strokeLinejoin="round"/>
-</svg>
-);
+//           {/* Feature Main Title */}
+//           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase leading-[1.05] text-neutral-100">
+//             Pro Installation in 90 minutes or less.
+//           </h2>
 
-const LocationIcon = () => (
-<svg className="w-14 h-14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-<path d="M12 22s8-5 8-12a8 8 0 10-16 0c0 7 8 12 8 12z"/>
-<circle cx="12" cy="10" r="3"/>
-</svg>
-);
+//           {/* Main Description */}
+//           <p className="text-neutral-400 text-base sm:text-lg font-normal leading-relaxed max-w-xl">
+//             Our in-house technicians fit every accessory we sell — 
+//             clean wiring, factory-grade finish, lifetime workmanship warranty.
+//           </p>
+//         </div>
 
-/* ================= CONTACT PAGE ================= */
+//       </div>
+//       <ContactInfo/>
+//     </section>
+    
+//   );
+// }
 
-const Contact = () => {
 
-const [form,setForm]=useState({
-name:"",
-email:"",
-message:""
-});
 
-const handleChange=(e)=>{
-setForm({...form,[e.target.name]:e.target.value});
-};
 
-const handleSubmit=(e)=>{
-e.preventDefault();
-alert("Message sent successfully!");
-setForm({name:"",email:"",message:""});
-};
+import React from 'react';
+import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import ContactImage from "../../assets/Mains/Porsche.jpg";
 
-return(
-<div className="bg-white">
+// ======================
+// Install Bay Feature
+// ======================
+export function InstallBayFeature() {
+  return (
+    <section className="bg-neutral-950 p-6 sm:p-12 md:p-16 text-white">
+      <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+        
+        {/* Left Side: Image */}
+        <div className="relative aspect-[4/3] sm:aspect-video md:aspect-[4/3] w-full rounded-2xl overflow-hidden group">
+          <img 
+            src={ContactImage} 
+            alt="Car interior with ambient led lighting" 
+            className="w-full h-full object-cover grayscale opacity-80 mix-blend-lighten transition-all duration-500 group-hover:scale-105 group-hover:opacity-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/10 via-transparent to-red-500/10 pointer-events-none" />
+        </div>
 
-{/* ================= HEADER ================= */}
-<section className="bg-emerald-50/50 py-16 px-8">
+        {/* Right Side: Content */}
+        <div className="space-y-4 md:space-y-6">
+          <span className="text-xs font-bold tracking-[0.3em] uppercase text-orange-500 block">
+            Install Bay
+          </span>
 
-<div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase leading-[1.05] text-neutral-100">
+            Pro Installation in 90 minutes or less.
+          </h2>
 
-<h4 className="text-[#2E7D56] font-semibold uppercase text-sm mb-4">
-Contact Us
-</h4>
+          <p className="text-neutral-400 text-base sm:text-lg font-normal leading-relaxed max-w-xl">
+            Our in-house technicians fit every accessory we sell — 
+            clean wiring, factory-grade finish, lifetime workmanship warranty.
+          </p>
+        </div>
 
-<h2 className="text-5xl font-semibold text-gray-900 mb-6">
-We’re here to help you
-</h2>
+      </div>
+    </section>
+  );
+}
 
-<p className="text-gray-600 text-lg max-w-2xl mx-auto">
-Have questions about pharmacy, supplements, fitness or orders?
-Our team is ready to support you.
-</p>
+// ======================
+// Contact Info
+// ======================
+export function ContactInfo() {
+  const contactDetails = [
+    {
+      title: 'Visit',
+      icon: MapPin,
+      content: (
+        <>
+          1200 Motorway Ave
+          <br />
+          Los Angeles, CA 90015
+        </>
+      ),
+      link: 'https://maps.google.com',
+    },
+    {
+      title: 'Call',
+      icon: Phone,
+      content: '+1 (800) 555-0199',
+      link: 'tel:+18005550199',
+    },
+    {
+      title: 'Email',
+      icon: Mail,
+      content: 'hello@motorhaus.com',
+      link: 'mailto:hello@motorhaus.com',
+    },
+    {
+      title: 'Hours',
+      icon: Clock,
+      content: (
+        <>
+          Mon–Sat · 9am–8pm
+          <br />
+          Sun · 10am–6pm
+        </>
+      ),
+      link: null,
+    },
+  ];
 
-</div>
+  return (
+    <section className="bg-neutral-950 p-6 sm:p-12 md:p-16 text-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="space-y-4">
+          {contactDetails.map((item, index) => {
+            const IconComponent = item.icon;
+            const WrapperComponent = item.link ? 'a' : 'div';
 
-</section>
+            return (
+              <WrapperComponent
+                key={index}
+                href={item.link || undefined}
+                target={item.link && item.link.startsWith('http') ? '_blank' : undefined}
+                rel={item.link && item.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className={`bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-5 flex items-start gap-5 w-full transition-all duration-300 min-h-[96px] ${
+                  item.link 
+                    ? 'hover:border-orange-500/30 hover:bg-neutral-900 group cursor-pointer' 
+                    : 'cursor-default'
+                }`}
+              >
+                {/* Icon */}
+                <div className="bg-orange-500 text-black p-3 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
+                  <IconComponent className="w-5 h-5 stroke-[2.5]" />
+                </div>
 
-{/* ================= CONTACT CARDS ================= */}
-<section className="py-20 px-6">
+                {/* Content */}
+                <div className="flex flex-col justify-center pt-0.5">
+                  <h3 className="text-lg font-black tracking-tight uppercase text-neutral-100 group-hover:text-white transition-colors">
+                    {item.title}
+                  </h3>
+                  <div className="text-neutral-400 text-sm sm:text-base mt-1 font-normal leading-relaxed tracking-wide">
+                    {item.content}
+                  </div>
+                </div>
+              </WrapperComponent>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-<div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
-
-{/* PHONE */}
-<div className="bg-white rounded-3xl p-10 shadow-md hover:shadow-xl border text-center">
-<div className="flex justify-center text-[#2E7D56] mb-6">
-<PhoneIcon />
-</div>
-<h3 className="text-2xl font-semibold mb-2">Call Us</h3>
-<p className="text-gray-600">+94 11 234 5678</p>
-</div>
-
-{/* EMAIL */}
-<div className="bg-white rounded-3xl p-10 shadow-md hover:shadow-xl border text-center">
-<div className="flex justify-center text-[#2E7D56] mb-6">
-<MailIcon />
-</div>
-<h3 className="text-2xl font-semibold mb-2">Email</h3>
-<p className="text-gray-600">support@vivara.com</p>
-</div>
-
-{/* LOCATION */}
-<div className="bg-white rounded-3xl p-10 shadow-md hover:shadow-xl border text-center">
-<div className="flex justify-center text-[#2E7D56] mb-6">
-<LocationIcon />
-</div>
-<h3 className="text-2xl font-semibold mb-2">Location</h3>
-<p className="text-gray-600">Colombo, Sri Lanka</p>
-</div>
-
-</div>
-
-</section>
-
-{/* ================= FORM ================= */}
-<section className="bg-[#f7faf8] py-20 px-6">
-
-<div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-
-{/* LEFT TEXT */}
-{/* <div>
-<h2 className="text-4xl font-bold mb-6">
-Send us a message
-</h2>
-
-<p className="text-gray-600 text-lg">
-We usually respond within 24 hours.
-</p>
-</div> */}
-
-{/* FORM */}
-{/* <form
-onSubmit={handleSubmit}
-className="bg-white rounded-3xl shadow-md p-10 space-y-6"
->
-
-<input
-type="text"
-name="name"
-placeholder="Your Name"
-value={form.name}
-onChange={handleChange}
-className="w-full p-4 border rounded-xl focus:outline-none focus:border-[#2E7D56]"
-/>
-
-<input
-type="email"
-name="email"
-placeholder="Your Email"
-value={form.email}
-onChange={handleChange}
-className="w-full p-4 border rounded-xl focus:outline-none focus:border-[#2E7D56]"
-/>
-
-<textarea
-name="message"
-placeholder="Your Message"
-value={form.message}
-onChange={handleChange}
-rows="5"
-className="w-full p-4 border rounded-xl focus:outline-none focus:border-[#2E7D56]"
-/>
-
-<button
-type="submit"
-className="w-full py-4 bg-[#2E7D56] text-white rounded-xl font-semibold hover:bg-[#256a47]"
->
-Send Message
-</button>
-
-</form> */}
-
-</div>
-
-</section>
-
-{/* ================= CTA ================= */}
-<section className="py-24 px-6 bg-white">
-
-<div className="max-w-6xl mx-auto">
-
-<div className="rounded-[32px] bg-[#2E7D56] px-10 md:px-20 py-20 text-center text-white shadow-xl">
-
-<h2 className="text-5xl font-bold">
-Need immediate support?
-</h2>
-
-<p className="mt-6 text-lg text-emerald-100 max-w-2xl mx-auto">
-Our team is available to help you with orders, prescriptions and guidance.
-</p>
-
-<a
-href="https://wa.me/94712345678"   // Change this number to your WhatsApp number
-target="_blank"
-rel="noopener noreferrer"
-className="inline-block mt-10 px-10 py-4 bg-white text-[#2E7D56] rounded-xl font-semibold hover:scale-105 transition"
->
-Contact Support
-</a>
-
-</div>
-
-</div>
-
-</section>
-
-</div>
-);
-};
-
-export default Contact;
+// ======================
+// Main Combined Component (Default Export)
+// ======================
+export default function InstallBayWithContact() {
+  return (
+    <>
+      <InstallBayFeature />
+      <ContactInfo />
+    </>
+  );
+}

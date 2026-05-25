@@ -1,75 +1,49 @@
--- pharmacy_db
-
--- 1. Categories Table
-CREATE TABLE IF NOT EXISTS categories (
+-- Accessories Table
+CREATE TABLE IF NOT EXISTS accessories (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    slug VARCHAR(100) UNIQUE,
+    title VARCHAR(255) NOT NULL,
     description TEXT,
+    price VARCHAR(50) NOT NULL,
+    icon_name VARCHAR(100) DEFAULT 'Volume2',
+    is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Subcategories Table
-CREATE TABLE IF NOT EXISTS subcategories (
+-- Auto Parts Table
+CREATE TABLE IF NOT EXISTS auto_parts (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    category_id INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    slug VARCHAR(100),
-    description TEXT,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-);
-
--- 3. Products Table
-CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    category_id INT NOT NULL,
-    sub_category_id INT NOT NULL,
-    name VARCHAR(200) NOT NULL,
-    description TEXT,
-    price DECIMAL(10,2) NOT NULL,
-    image_url VARCHAR(255),
-    popular BOOLEAN DEFAULT FALSE,
-    stock INT DEFAULT 0,
-    status ENUM('active','inactive') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-    FOREIGN KEY (sub_category_id) REFERENCES subcategories(id) ON DELETE CASCADE
-);
-
--- 4. Users Table (for Login & Signup)
-CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('user', 'admin') DEFAULT 'user',
+    title VARCHAR(255) NOT NULL,
+    skus VARCHAR(100),
+    price VARCHAR(50) NOT NULL,
+    icon_name VARCHAR(100),
+    type ENUM('main', 'additional') DEFAULT 'main',
+    is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert Categories
-INSERT INTO categories (name, slug, description) VALUES
-('Pharmacy', 'pharmacy', 'Medicines and healthcare products'),
-('Supplements', 'supplements', 'Vitamins and nutritional supplements'),
-('Fitness', 'fitness', 'Fitness equipment and gear')
-ON DUPLICATE KEY UPDATE name=VALUES(name);
+-- Vehicles Table (with image support)
+CREATE TABLE IF NOT EXISTS vehicles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price VARCHAR(50) NOT NULL,
+    year VARCHAR(10),
+    fuel VARCHAR(50),
+    power VARCHAR(50),
+    image_url VARCHAR(255) DEFAULT NULL,
+    is_new TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
--- Insert Subcategories
-INSERT INTO subcategories (category_id, name, slug, description) VALUES
--- Pharmacy
-(1, 'Prescription Medicines', 'prescriptions', 'Doctor prescribed medicines'),
-(1, 'Everyday Health Essentials', 'otc-medicine', 'OTC medicines and daily care'),
-(1, 'Vaccines & Wellness Care', 'vaccines-wellness', 'Vaccinations and wellness products'),
+-- Sample Data
+INSERT INTO accessories (title, description, price, icon_name) VALUES
+('Premium Audio', 'JBL, Pioneer, Alpine head units, subs, amps & speaker upgrades.', '$149', 'Volume2'),
+('Custom Interiors', 'Leather seat covers, dash kits, floor liners, ambient lighting.', '$89', 'Armchair');
 
--- Supplements
-(2, 'Vitamins & Minerals', 'vitamins-minerals', 'Daily vitamins and minerals'),
-(2, 'Immunity & Energy', 'immunity-energy', 'Boost immunity and energy'),
-(2, 'Sports Nutrition', 'sports-nutrition', 'Protein and performance supplements'),
-(2, 'Herbal Wellness', 'herbal-wellness', 'Ayurvedic and herbal products'),
+INSERT INTO auto_parts (title, skus, price, icon_name, type) VALUES
+('Brakes & Rotors', '1,240 SKUs', '$39', 'CircleDot', 'main'),
+('Batteries', '180 SKUs', '$109', 'BatteryCharging', 'main'),
+('Engine Parts', '2,100 SKUs', '$19', 'Settings', 'additional'),
+('Electrical', '950 SKUs', '$12', 'Zap', 'additional');
 
--- Fitness
-(3, 'Cardio Equipment', 'cardio-equipment', 'Treadmills and cardio machines'),
-(3, 'Strength Training', 'strength-training', 'Weights and strength gear'),
-(3, 'Accessories & Recovery', 'accessories-recovery', 'Yoga mats and recovery tools')
-ON DUPLICATE KEY UPDATE name=VALUES(name);
-
-
+INSERT INTO vehicles (name, price, year, fuel, power, image_url, is_new) VALUES
+('TOYOTA CAMRY XSE', '$34,990', '2025', '32 city', '206 hp', 'uploads/vehicles/camry.jpg', 1);

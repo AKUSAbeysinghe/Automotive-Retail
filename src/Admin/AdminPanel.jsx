@@ -1,207 +1,150 @@
 import React, { useEffect, useState } from "react";
 
-const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState("products");
+const API_BASE = "http://localhost/automotive_retail/api";
+
+export default function AdminPanel() {
+  const [activeTab, setActiveTab] = useState("accessories");
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
 
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [accessories, setAccessories] = useState([]);
+  const [autoParts, setAutoParts] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
 
-  const [formData, setFormData] = useState({
-    category_id: "",
-    sub_category_id: "",
-    name: "",
-    price: "",
-    description: "",
-    image: null,
-    popular: false,
-    stock: 0,
-  });
+  const [formData, setFormData] = useState({});
 
-  const [admin] = useState({
-    name: "Admin",
-    email: "admin@pharmacy.lk",
-    profilePic: "https://i.pravatar.cc/100?img=25",
-  });
+  const tabs = [
+    { id: "accessories", label: "Accessories" },
+    { id: "autoparts", label: "Auto Parts" },
+    { id: "vehicles", label: "Vehicles" },
+  ];
 
-  // Fetch Categories
-  const fetchCategories = async () => {
+  // Fetch Data
+  const fetchAllData = async () => {
     try {
-      const res = await fetch("http://localhost/pharmacy-project/api/get_categories.php");
-      const data = await res.json();
+      const [accRes, apRes, vehRes] = await Promise.all([
+        fetch(`${API_BASE}/get_accessories.php`),
+        fetch(`${API_BASE}/get_autoparts.php`),
+        fetch(`${API_BASE}/get_vehicles.php`)
+      ]);
 
-      if (data.success && data.data) {
-        setCategories(data.data);
-        if (data.data.length > 0) {
-          const firstCatId = data.data[0].id;
-          setFormData(prev => ({ ...prev, category_id: firstCatId }));
-          fetchSubCategories(firstCatId);
-        }
-      }
-    } catch (err) {
-      setError("Cannot connect to server.");
-    }
-  };
+      const accData = await accRes.json();
+      const apData = await apRes.json();
+      const vehData = await vehRes.json();
 
-  // Fetch Subcategories
-  const fetchSubCategories = async (categoryId) => {
-    if (!categoryId) return;
-    try {
-      const res = await fetch(
-        `http://localhost/pharmacy-project/api/get_subcategories.php?category_id=${categoryId}`
-      );
-      const data = await res.json();
-      if (data.success) {
-        setSubCategories(data.data || []);
-        if (data.data?.length > 0) {
-          setFormData(prev => ({ ...prev, sub_category_id: data.data[0].id }));
-        }
-      }
+      if (accData.success) setAccessories(accData.data || []);
+      if (apData.success) setAutoParts(apData.data || []);
+      if (vehData.success) setVehicles(vehData.data || []);
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  // Fetch Products
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch("http://localhost/pharmacy-project/api/get_products.php");
-      const data = await res.json();
-      if (data.success) setProducts(data.data || []);
-    } catch (err) {
-      console.error(err);
+      setError("Cannot connect to server. Check API path.");
     }
   };
 
   useEffect(() => {
-    fetchCategories();
-    fetchProducts();
+    fetchAllData();
   }, []);
+
+  const openForm = (item = null) => {
+    setIsEditing(!!item);
+    setEditId(item?.id || null);
+    setFormData(item || {});
+    setShowForm(true);
+    setMessage("");
+    setError("");
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked
-            : type === "file" ? files[0]
-            : name === "price" || name === "stock" ? Number(value) || 0
-            : value,
-    }));
-
-    if (name === "category_id") {
-      setFormData((prev) => ({ ...prev, sub_category_id: "" }));
-      fetchSubCategories(value);
+    if (type === "file") {
+      setFormData(prev => ({ ...prev, image: files[0] }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value
+      }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
     setIsSubmitting(true);
+    setError("");
+    setMessage("");
 
-    if (!formData.name || !formData.price || !formData.category_id || !formData.sub_category_id) {
-      setError("⚠️ Name, Price, Category, and Subcategory are required.");
-      setIsSubmitting(false);
-      return;
+    let url = "";
+    let isMultipart = activeTab === "vehicles";
+
+    if (activeTab === "accessories") {
+      url = isEditing ? "update_accessory.php" : "add_accessory.php";
+    } else if (activeTab === "autoparts") {
+      url = isEditing ? "update_autopart.php" : "add_autopart.php";
+    } else if (activeTab === "vehicles") {
+      url = isEditing ? "update_vehicle.php" : "add_vehicle.php";
     }
 
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => {
-      if (formData[key] !== null && formData[key] !== undefined) {
-        formDataToSend.append(key, formData[key]);
-      }
-    });
-
-    if (isEditing) formDataToSend.append("id", editId);
-
     try {
-      const url = isEditing
-        ? "http://localhost/pharmacy-project/api/update_product.php"
-        : "http://localhost/pharmacy-project/api/add_product.php";
+      let body;
+      if (isMultipart) {
+        const fd = new FormData();
+        Object.keys(formData).forEach(key => {
+          if (formData[key] !== undefined && formData[key] !== null) {
+            fd.append(key, formData[key]);
+          }
+        });
+        if (isEditing) fd.append("id", editId);
+        body = fd;
+      } else {
+        body = JSON.stringify({ ...formData, id: editId });
+      }
 
-      const res = await fetch(url, { method: "POST", body: formDataToSend });
+      const res = await fetch(`${API_BASE}/${url}`, {
+        method: "POST",
+        body: body,
+      });
+
       const result = await res.json();
 
       if (result.success) {
-        setMessage(isEditing ? "✅ Updated!" : "✅ Product added successfully!");
+        setMessage(isEditing ? "✅ Updated successfully!" : "✅ Added successfully!");
         setShowForm(false);
-        resetForm();
-        fetchProducts();
+        fetchAllData();
       } else {
         setError(result.message || "Failed to save");
       }
     } catch (err) {
       setError("Server error occurred");
+      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      category_id: categories.length > 0 ? categories[0].id : "",
-      sub_category_id: "",
-      name: "",
-      price: "",
-      description: "",
-      image: null,
-      popular: false,
-      stock: 0,
-    });
-    setIsEditing(false);
-    setEditId(null);
-  };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this?")) return;
 
-  const handleEdit = (product) => {
-    setFormData({
-      category_id: product.category_id,
-      sub_category_id: product.sub_category_id,
-      name: product.name,
-      price: product.price,
-      description: product.description || "",
-      image: null,
-      popular: Boolean(product.popular),
-      stock: product.stock || 0,
-    });
-    fetchSubCategories(product.category_id);
-    setIsEditing(true);
-    setEditId(product.id);
-    setShowForm(true);
-  };
+    let endpoint = "";
+    if (activeTab === "accessories") endpoint = "delete_accessory.php";
+    else if (activeTab === "autoparts") endpoint = "delete_autopart.php";
+    else if (activeTab === "vehicles") endpoint = "delete_vehicle.php";
 
-  const confirmDelete = (id) => {
-    setItemToDelete(id);
-    setShowConfirmModal(true);
-  };
-
-  const handleDelete = async () => {
-    if (!itemToDelete) return;
     try {
-      const res = await fetch("http://localhost/pharmacy-project/api/delete_product.php", {
+      const res = await fetch(`${API_BASE}/${endpoint}`, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `id=${itemToDelete}`,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
       });
       const result = await res.json();
       if (result.success) {
-        setMessage("✅ Deleted!");
-        setProducts(prev => prev.filter(p => p.id !== itemToDelete));
+        setMessage("✅ Deleted successfully!");
+        fetchAllData();
       }
     } catch (err) {
       setError("Delete failed");
-    } finally {
-      setShowConfirmModal(false);
-      setItemToDelete(null);
     }
   };
 
@@ -210,11 +153,13 @@ const AdminPanel = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8 bg-white rounded-xl shadow p-6">
         <div className="flex items-center gap-6">
-          <img src={admin.profilePic} alt="admin" className="w-20 h-20 rounded-full border-4 border-emerald-500" />
+          <div className="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+            M
+          </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{admin.name}</h1>
-            <p className="text-gray-600">{admin.email}</p>
-            <p className="text-emerald-600 font-semibold">Pharmacy Admin Panel</p>
+            <h1 className="text-3xl font-bold text-gray-900">Motorhaus Admin</h1>
+            <p className="text-gray-600">Automotive Retail Management</p>
+            <p className="text-orange-600 font-semibold">Admin Panel</p>
           </div>
         </div>
       </div>
@@ -223,150 +168,178 @@ const AdminPanel = () => {
       {message && <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-xl">{message}</div>}
       {error && <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-800 rounded-xl">{error}</div>}
 
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6 bg-white p-2 rounded-xl shadow w-fit">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-6 py-3 rounded-xl font-medium transition-all ${
+              activeTab === tab.id ? "bg-orange-600 text-white" : "hover:bg-gray-100"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div className="mb-6">
         <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-3 rounded-full font-semibold shadow-lg"
+          onClick={() => openForm()}
+          className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg"
         >
-          + Add New Product
+          + Add New {activeTab === "vehicles" ? "Vehicle" : activeTab === "autoparts" ? "Auto Part" : "Accessory"}
         </button>
       </div>
 
-      {/* Products Table */}
+      {/* Data Table */}
       <div className="bg-white rounded-2xl shadow overflow-hidden">
         <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold">All Products</h2>
+          <h2 className="text-2xl font-bold">
+            {activeTab === "accessories" && "All Accessories"}
+            {activeTab === "autoparts" && "All Auto Parts"}
+            {activeTab === "vehicles" && "All Vehicles"}
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-4 text-left">Image</th>
-                <th className="p-4 text-left">Product Name</th>
-                <th className="p-4 text-left">Category</th>
-                <th className="p-4 text-left">Subcategory</th>
-                <th className="p-4 text-left">Price</th>
-                <th className="p-4 text-left">Stock</th>
-                <th className="p-4 text-left">Popular</th>
-                <th className="p-4 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length === 0 ? (
-                <tr><td colSpan="8" className="p-10 text-center text-gray-500">No products yet</td></tr>
-              ) : (
-                products.map((product) => (
-                  <tr key={product.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4">
-                      <img
-                        src={
-                          product.image_url
-                            ? `http://localhost/pharmacy-project/${product.image_url}`
-                            : "https://via.placeholder.com/80x80?text=No+Image"
-                        }
-                        alt={product.name}
-                        className="w-16 h-16 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.target.src = "https://via.placeholder.com/80x80?text=Failed";
-                        }}
-                      />
-                    </td>
-                    <td className="p-4 font-medium">{product.name}</td>
-                    <td className="p-4">{product.category_name || "—"}</td>
-                    <td className="p-4">{product.sub_category_name || "—"}</td>
-                    <td className="p-4 font-semibold text-emerald-700">
-                      Rs. {Number(product.price).toLocaleString("en-LK")}
-                    </td>
-                    <td className="p-4">{product.stock}</td>
-                    <td className="p-4">
-                      {product.popular ? "Yes" : "No"}
-                    </td>
-                    <td className="p-4 space-x-3">
-                      <button onClick={() => handleEdit(product)} className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm hover:bg-blue-700">
-                        Edit
-                      </button>
-                      <button onClick={() => confirmDelete(product.id)} className="bg-red-600 text-white px-5 py-2 rounded-full text-sm hover:bg-red-700">
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          {activeTab === "vehicles" ? (
+            <VehiclesTable data={vehicles} onEdit={openForm} onDelete={handleDelete} />
+          ) : (
+            <GenericTable 
+              data={activeTab === "accessories" ? accessories : autoParts} 
+              onEdit={openForm} 
+              onDelete={handleDelete} 
+              tab={activeTab}
+            />
+          )}
         </div>
       </div>
 
-      {/* Add/Edit Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8">
-            <h3 className="text-2xl font-bold mb-6 text-center">
-              {isEditing ? "Edit Product" : "Add New Product"}
-            </h3>
-
-            {/* Category & Subcategory selects */}
-            <select name="category_id" value={formData.category_id} onChange={handleChange} className="w-full p-3 mb-4 border rounded-xl" required>
-              <option value="">Select Category</option>
-              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-            </select>
-
-            <select name="sub_category_id" value={formData.sub_category_id} onChange={handleChange} className="w-full p-3 mb-4 border rounded-xl" required>
-              <option value="">Select Subcategory</option>
-              {subCategories.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
-            </select>
-
-            <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} className="w-full p-3 mb-4 border rounded-xl" required />
-
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label>Price (Rs.)</label>
-                <input type="number" name="price" step="0.01" value={formData.price} onChange={handleChange} className="w-full p-3 border rounded-xl" required />
-              </div>
-              <div>
-                <label>Stock</label>
-                <input type="number" name="stock" value={formData.stock} onChange={handleChange} className="w-full p-3 border rounded-xl" />
-              </div>
-            </div>
-
-            <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} className="w-full p-3 mb-4 border rounded-xl h-24" />
-
-            <div className="flex items-center gap-2 mb-4">
-              <input type="checkbox" name="popular" checked={formData.popular} onChange={handleChange} />
-              <label>Mark as Popular</label>
-            </div>
-
-            <div className="mb-6">
-              <label className="block mb-2">Product Image</label>
-              <input type="file" name="image" accept="image/*" onChange={handleChange} className="w-full" />
-            </div>
-
-            <div className="flex justify-end gap-4">
-              <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 bg-gray-200 rounded-xl">Cancel</button>
-              <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-emerald-700 text-white rounded-xl">
-                {isSubmitting ? "Saving..." : isEditing ? "Update" : "Add Product"}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center">
-            <h3 className="text-xl font-bold mb-4">Confirm Delete</h3>
-            <p className="mb-6">Are you sure?</p>
-            <div className="flex justify-center gap-4">
-              <button onClick={() => setShowConfirmModal(false)} className="px-6 py-3 bg-gray-200 rounded-xl">Cancel</button>
-              <button onClick={handleDelete} className="px-6 py-3 bg-red-600 text-white rounded-xl">Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Form Modal */}
+      {showForm && <FormModal 
+        activeTab={activeTab} 
+        formData={formData} 
+        isEditing={isEditing}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        onClose={() => setShowForm(false)}
+        isSubmitting={isSubmitting}
+      />}
     </div>
   );
-};
+}
 
-export default AdminPanel;
+// ====================== SUPPORTING COMPONENTS ======================
+
+function GenericTable({ data, onEdit, onDelete, tab }) {
+  return (
+    <table className="min-w-full">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="p-4 text-left">Title</th>
+          <th className="p-4 text-left">Price</th>
+          {tab === "autoparts" && <th className="p-4 text-left">SKUs</th>}
+          <th className="p-4 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.length === 0 ? (
+          <tr><td colSpan="4" className="p-12 text-center text-gray-500">No records found</td></tr>
+        ) : (
+          data.map(item => (
+            <tr key={item.id} className="border-b hover:bg-gray-50">
+              <td className="p-4 font-medium">{item.title || item.name}</td>
+              <td className="p-4">{item.price}</td>
+              {tab === "autoparts" && <td className="p-4">{item.skus}</td>}
+              <td className="p-4 space-x-3">
+                <button onClick={() => onEdit(item)} className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm hover:bg-blue-700">Edit</button>
+                <button onClick={() => onDelete(item.id)} className="bg-red-600 text-white px-5 py-2 rounded-full text-sm hover:bg-red-700">Delete</button>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function VehiclesTable({ data, onEdit, onDelete }) {
+  return (
+    <table className="min-w-full">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="p-4 text-left">Image</th>
+          <th className="p-4 text-left">Name</th>
+          <th className="p-4 text-left">Price</th>
+          <th className="p-4 text-left">Year</th>
+          <th className="p-4 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.length === 0 ? (
+          <tr><td colSpan="5" className="p-12 text-center text-gray-500">No vehicles found</td></tr>
+        ) : (
+          data.map(item => (
+            <tr key={item.id} className="border-b hover:bg-gray-50">
+              <td className="p-4">
+                {item.image_url ? (
+                  <img src={`http://localhost/automotive_retail/${item.image_url}`} alt={item.name} className="w-20 h-16 object-cover rounded-lg" />
+                ) : "No Image"}
+              </td>
+              <td className="p-4 font-medium">{item.name}</td>
+              <td className="p-4">{item.price}</td>
+              <td className="p-4">{item.year}</td>
+              <td className="p-4 space-x-3">
+                <button onClick={() => onEdit(item)} className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm hover:bg-blue-700">Edit</button>
+                <button onClick={() => onDelete(item.id)} className="bg-red-600 text-white px-5 py-2 rounded-full text-sm hover:bg-red-700">Delete</button>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function FormModal({ activeTab, formData, isEditing, onChange, onSubmit, onClose, isSubmitting }) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+      <form onSubmit={onSubmit} className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8">
+        <h3 className="text-2xl font-bold mb-6 text-center">
+          {isEditing ? "Edit" : "Add New"} {activeTab === "autoparts" ? "Auto Part" : activeTab === "accessories" ? "Accessory" : "Vehicle"}
+        </h3>
+
+        {(activeTab === "accessories" || activeTab === "autoparts") && (
+          <>
+            <input name="title" placeholder="Title" value={formData.title || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" required />
+            <input name="price" placeholder="Price" value={formData.price || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" required />
+            {activeTab === "autoparts" && <input name="skus" placeholder="SKUs" value={formData.skus || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" />}
+          </>
+        )}
+
+        {activeTab === "vehicles" && (
+          <>
+            <input name="name" placeholder="Vehicle Name" value={formData.name || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" required />
+            <input name="price" placeholder="Price" value={formData.price || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" required />
+            <input name="year" placeholder="Year" value={formData.year || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" />
+            <input name="fuel" placeholder="Fuel Economy" value={formData.fuel || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" />
+            <input name="power" placeholder="Power" value={formData.power || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" />
+
+            <div className="mb-6">
+              <label className="block mb-2">Vehicle Image</label>
+              <input type="file" name="image" accept="image/*" onChange={onChange} className="w-full" />
+            </div>
+          </>
+        )}
+
+        <div className="flex justify-end gap-4">
+          <button type="button" onClick={onClose} className="px-6 py-3 bg-gray-200 rounded-xl">Cancel</button>
+          <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-orange-600 text-white rounded-xl">
+            {isSubmitting ? "Saving..." : isEditing ? "Update" : "Add"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

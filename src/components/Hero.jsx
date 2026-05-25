@@ -1,84 +1,66 @@
 import React from 'react';
-import Mains from '../assets/Mains/Banner.png';
+import BannerCar from "../assets/Mains/SidedCar.jpg";
 
-const HeroSection = () => {
-  const whatsappNumber = "919876543210"; // ← Change to your actual WhatsApp number
-
-  const openWhatsApp = (message = "") => {
-    const encodedMessage = encodeURIComponent(message);
-    const url = encodedMessage 
-      ? `https://wa.me/${whatsappNumber}?text=${encodedMessage}` 
-      : `https://wa.me/${whatsappNumber}`;
-    window.open(url, '_blank');
-  };
-
+export default function HeroSection() {
   return (
-    <section className="relative min-h-screen bg-[#FCFAF7] px-8 py-20 overflow-hidden">
-
-      {/* Blurred Background Image */}
-      <div
-        className="absolute inset-0 bg-center bg-cover opacity-40 blur-xl scale-110"
-        style={{
-          backgroundImage: `url(${Mains})`,
+    <section className="relative bg-[#0B0D0F] text-white min-h-[600px] flex items-center justify-start overflow-hidden font-sans px-6 md:px-16 lg:px-24 py-20">
+      
+      {/* Background Image Overlay with Dark Vignette */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 select-none pointer-events-none"
+        style={{ 
+          backgroundImage: `url(${BannerCar})`
         }}
       />
 
-      {/* Content */}
-      <div className="relative max-w-3xl mx-auto text-center">
+      {/* Subtle radial gradient overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(250,84,28,0.12),transparent_50%)] pointer-events-none" />
 
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-gray-200 rounded-full text-sm text-gray-700 bg-white shadow-sm">
-          <span>✨</span>
-          <span>Your wellness, simplified</span>
+      {/* Content Container */}
+      <div className="relative z-10 max-w-4xl flex flex-col items-start space-y-6">
+        
+        {/* Top Tag */}
+        <div className="inline-flex items-center space-x-2 border border-[#FF833E]/30 bg-[#FF833E]/5 px-4 py-1.5 rounded-full backdrop-blur-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#FF833E] animate-pulse" />
+          <span className="text-[#FF833E] text-xs font-bold tracking-widest uppercase">
+            EST. 1998 · AUTOMOTIVE RETAIL
+          </span>
         </div>
 
-        {/* Heading */}
-        <h1 className="text-6xl font-semibold text-gray-900 leading-tight mb-6">
-          Health & wellness, <br />
-          <span className="text-[#2E7D56]">
-            all in one place.
-          </span>
+        {/* Main Headline */}
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none uppercase font-mono select-none">
+          DRIVE WHAT <span className="bg-gradient-to-r from-[#FF833E] to-[#FA541C] bg-clip-text text-transparent">MOVES</span> YOU.
         </h1>
 
-        {/* Subtext */}
-        <p className="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
-          From trusted pharmacies and premium supplements to modern fitness
-          clubs — Vivara connects you with everything you need to feel your best.
+        {/* Subtitle Description */}
+        <p className="text-gray-400 text-base md:text-lg lg:text-xl max-w-2xl leading-relaxed font-light">
+          From the showroom floor to the toolbox — Motorhaus delivers cars, 
+          parts, and accessories that meet the road on your terms.
         </p>
 
-        {/* Buttons */}
-        <div className="flex items-center justify-center gap-4 mb-10">
-          {/* Primary Button */}
-          <button 
-            onClick={() => openWhatsApp("Hi, I'm interested in exploring wellness services.")}
-            className="flex items-center gap-2 px-6 py-3 bg-[#2E7D56] text-white rounded-full font-medium hover:bg-[#256a47] transition-all"
-          >
-            Explore wellness <span>→</span>
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 w-full sm:w-auto">
+          
+          {/* Primary CTA */}
+          <button className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-[#FF833E] to-[#FA541C] text-[#121416] font-bold text-sm tracking-wider px-8 py-4 rounded-lg shadow-lg hover:brightness-110 active:scale-98 transition-all duration-200">
+            <span>BROWSE INVENTORY</span>
+            <svg 
+              className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </button>
 
-          {/* Secondary Button */}
-          <button 
-            onClick={() => openWhatsApp("Hi, I'm interested in becoming a partner with Vivara.")}
-            className="px-6 py-3 bg-[#F0EFE9] text-gray-800 rounded-full font-medium hover:bg-[#e4e2da] transition-all"
-          >
-            For partners
+          {/* Secondary CTA */}
+          <button className="flex items-center justify-center border border-gray-800 bg-[#121416]/60 text-white font-bold text-sm tracking-wider px-8 py-4 rounded-lg hover:bg-gray-800/80 hover:border-gray-700 active:scale-98 transition-all duration-200 backdrop-blur-sm">
+            SHOP PARTS
           </button>
         </div>
-
-        {/* Trust Indicator */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="flex text-orange-400 text-xl">
-            ★★★★★
-          </div>
-
-          <span className="text-gray-600 font-medium">
-            Trusted by <span className="font-bold">2M+</span> members worldwide
-          </span>
-        </div>
-
       </div>
     </section>
   );
-};
-
-export default HeroSection;
+}
