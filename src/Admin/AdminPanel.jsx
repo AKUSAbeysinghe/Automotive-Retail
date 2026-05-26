@@ -23,7 +23,7 @@ export default function AdminPanel() {
     { id: "vehicles", label: "Vehicles" },
   ];
 
-  // Fetch Data
+  // Fetch Data with better logging
   const fetchAllData = async () => {
     try {
       const [accRes, apRes, vehRes] = await Promise.all([
@@ -39,6 +39,10 @@ export default function AdminPanel() {
       if (accData.success) setAccessories(accData.data || []);
       if (apData.success) setAutoParts(apData.data || []);
       if (vehData.success) setVehicles(vehData.data || []);
+
+      // Debug: You can remove these console logs later
+      console.log("Accessories loaded:", accData.data);
+      console.log("Auto Parts loaded:", apData.data);
     } catch (err) {
       console.error(err);
       setError("Cannot connect to server. Check API path.");
@@ -79,13 +83,9 @@ export default function AdminPanel() {
     let url = "";
     let isMultipart = activeTab === "vehicles";
 
-    if (activeTab === "accessories") {
-      url = isEditing ? "update_accessory.php" : "add_accessory.php";
-    } else if (activeTab === "autoparts") {
-      url = isEditing ? "update_autopart.php" : "add_autopart.php";
-    } else if (activeTab === "vehicles") {
-      url = isEditing ? "update_vehicle.php" : "add_vehicle.php";
-    }
+    if (activeTab === "accessories") url = isEditing ? "update_accessory.php" : "add_accessory.php";
+    else if (activeTab === "autoparts") url = isEditing ? "update_autopart.php" : "add_autopart.php";
+    else if (activeTab === "vehicles") url = isEditing ? "update_vehicle.php" : "add_vehicle.php";
 
     try {
       let body;
@@ -102,17 +102,13 @@ export default function AdminPanel() {
         body = JSON.stringify({ ...formData, id: editId });
       }
 
-      const res = await fetch(`${API_BASE}/${url}`, {
-        method: "POST",
-        body: body,
-      });
-
+      const res = await fetch(`${API_BASE}/${url}`, { method: "POST", body });
       const result = await res.json();
 
       if (result.success) {
         setMessage(isEditing ? "✅ Updated successfully!" : "✅ Added successfully!");
         setShowForm(false);
-        fetchAllData();
+        fetchAllData();   // Refresh table
       } else {
         setError(result.message || "Failed to save");
       }
@@ -245,16 +241,38 @@ function GenericTable({ data, onEdit, onDelete, tab }) {
       </thead>
       <tbody>
         {data.length === 0 ? (
-          <tr><td colSpan="4" className="p-12 text-center text-gray-500">No records found</td></tr>
+          <tr>
+            <td colSpan="4" className="p-12 text-center text-gray-500">
+              No records found. Try adding some items.
+            </td>
+          </tr>
         ) : (
           data.map(item => (
             <tr key={item.id} className="border-b hover:bg-gray-50">
-              <td className="p-4 font-medium">{item.title || item.name}</td>
-              <td className="p-4">{item.price}</td>
-              {tab === "autoparts" && <td className="p-4">{item.skus}</td>}
+              <td className="p-4 font-medium">
+                {item.title || item.name || "No Title"}
+              </td>
+              <td className="p-4 font-medium text-orange-600">
+                {item.price || "N/A"}
+              </td>
+              {tab === "autoparts" && (
+                <td className="p-4 text-gray-600">
+                  {item.skus || "-"}
+                </td>
+              )}
               <td className="p-4 space-x-3">
-                <button onClick={() => onEdit(item)} className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm hover:bg-blue-700">Edit</button>
-                <button onClick={() => onDelete(item.id)} className="bg-red-600 text-white px-5 py-2 rounded-full text-sm hover:bg-red-700">Delete</button>
+                <button 
+                  onClick={() => onEdit(item)} 
+                  className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm hover:bg-blue-700"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => onDelete(item.id)} 
+                  className="bg-red-600 text-white px-5 py-2 rounded-full text-sm hover:bg-red-700"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))
@@ -265,6 +283,13 @@ function GenericTable({ data, onEdit, onDelete, tab }) {
 }
 
 function VehiclesTable({ data, onEdit, onDelete }) {
+  const getImageUrl = (image_url) => {
+    if (!image_url) return null;
+    const base = "http://localhost/automotive_retail/";
+    const path = image_url.startsWith('/') ? image_url.slice(1) : image_url;
+    return base + path;
+  };
+
   return (
     <table className="min-w-full">
       <thead className="bg-gray-50">
@@ -284,7 +309,12 @@ function VehiclesTable({ data, onEdit, onDelete }) {
             <tr key={item.id} className="border-b hover:bg-gray-50">
               <td className="p-4">
                 {item.image_url ? (
-                  <img src={`http://localhost/automotive_retail/${item.image_url}`} alt={item.name} className="w-20 h-16 object-cover rounded-lg" />
+                  <img 
+                    src={getImageUrl(item.image_url)} 
+                    alt={item.name} 
+                    className="w-20 h-16 object-cover rounded-lg border"
+                    onError={(e) => e.target.src = "https://via.placeholder.com/80x60?text=No+Image"}
+                  />
                 ) : "No Image"}
               </td>
               <td className="p-4 font-medium">{item.name}</td>
@@ -327,7 +357,7 @@ function FormModal({ activeTab, formData, isEditing, onChange, onSubmit, onClose
             <input name="power" placeholder="Power" value={formData.power || ""} onChange={onChange} className="w-full p-3 mb-4 border rounded-xl" />
 
             <div className="mb-6">
-              <label className="block mb-2">Vehicle Image</label>
+              <label className="block mb-2 font-medium">Vehicle Image</label>
               <input type="file" name="image" accept="image/*" onChange={onChange} className="w-full" />
             </div>
           </>

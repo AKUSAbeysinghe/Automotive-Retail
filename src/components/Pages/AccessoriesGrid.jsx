@@ -78,26 +78,36 @@
 
 
 
-
-
 import React from 'react';
-import { Volume2, Armchair } from 'lucide-react';
+import { Volume2, Armchair, Settings, Zap, BatteryCharging, CircleDot } from 'lucide-react';
 
 export default function AccessoriesGrid({ services = [] }) {
 
-  // Default / Fallback data (shown if admin sends nothing)
+  // Icon mapping based on icon_name from database
+  const iconMap = {
+    Volume2: Volume2,
+    Armchair: Armchair,
+    Settings: Settings,
+    Zap: Zap,
+    BatteryCharging: BatteryCharging,
+    CircleDot: CircleDot,
+    // Add more icons as you use them in admin
+    default: Volume2,
+  };
+
+  // Default fallback data
   const defaultServices = [
     {
       title: 'Premium Audio',
       description: 'JBL, Pioneer, Alpine head units, subs, amps & speaker upgrades.',
       price: '$149',
-      icon: Volume2,
+      icon_name: 'Volume2',
     },
     {
       title: 'Custom Interiors',
       description: 'Leather seat covers, dash kits, floor liners, ambient lighting.',
       price: '$89',
-      icon: Armchair,
+      icon_name: 'Armchair',
     },
   ];
 
@@ -111,10 +121,11 @@ export default function AccessoriesGrid({ services = [] }) {
         {/* Responsive Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {displayServices.map((service, index) => {
-            const IconComponent = service.icon;
+            const IconComponent = iconMap[service.icon_name] || iconMap.default;
+
             return (
               <div
-                key={index}
+                key={service.id || index}
                 className="bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:border-orange-500/30 hover:bg-neutral-900 group cursor-pointer min-h-[260px]"
               >
                 {/* Top Section: Icon & Heading Layout */}
