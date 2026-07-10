@@ -2,13 +2,13 @@ import React from 'react';
 
 export default function Footer() {
   const shopLinks = [
-    { name: 'Dealerships', href: '#' },
-    { name: 'Auto Parts', href: '#' },
-    { name: 'Accessories', href: '#' },
+    { name: 'Dealerships', href: '/Dealership' },
+    { name: 'Auto Parts', href: '/AutoParts' },
+    { name: 'Accessories', href: '/Accessories' },
   ];
 
   const companyLinks = [
-    { name: 'Contact', href: '#' },
+    { name: 'Contact', href: '/contact' },
     { name: 'Careers', href: '#' },
     { name: 'Press', href: '#' },
   ];
