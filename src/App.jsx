@@ -7,6 +7,9 @@ import Dealership from "./components/Pages/Dealership.jsx";
 import AutoParts from "./components/Pages/AutoParts.jsx";
 import Accessories from "./components/Pages/Accessories.jsx";
 
+import Press from "./components/Pages/Press.jsx";
+import Careers from "./components/Pages/Careers.jsx";
+
 import Footer from "./components/Footer";
 
 
@@ -65,7 +68,8 @@ function App() {
         <Route path="/AutoParts" element={<Layout><AutoParts/></Layout>} />
         <Route path="/Accessories" element={<Layout><Accessories/></Layout>} />
        
-
+        <Route path="/press" element={<Layout><Press/></Layout>} />
+          <Route path="/careers" element={<Layout><Careers/></Layout>} />
         <Route
           path="/privacy-policy"
           element={<Layout><PrivacyPolicy /></Layout>}

@@ -21,7 +21,7 @@ const Signup = () => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost/automotive retail/api/signup.php", {
+      const res = await fetch("http://localhost/Automative_DB/api/signup.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -30,68 +30,112 @@ const Signup = () => {
       const data = await res.json();
 
       if (data.success) {
-        setMessage("✅ Signup successful! Redirecting to Login...");
-        setTimeout(() => navigate("/login"), 1500);
+        setMessage("✅ Account created successfully! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       } else {
-        setMessage("❌ " + (data.message || "Signup failed"));
+        setMessage("❌ " + (data.message || "Signup failed. Please try again."));
       }
     } catch (err) {
-      setMessage("❌ Something went wrong! Make sure XAMPP is running.");
+      setMessage("❌ Something went wrong! Make sure backend is running.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-semibold mb-8 text-center text-gray-900">Create Account</h2>
+    <div className="min-h-screen bg-[#121416] flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        {/* Brand Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center">
+              <span className="text-black font-black text-3xl">M</span>
+            </div>
+            <h1 className="text-4xl font-black tracking-tighter text-white">Motorhaus</h1>
+          </div>
+          <p className="text-neutral-400 uppercase tracking-[2px] text-sm">Admin Portal</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
-            required
-          />
+        {/* Signup Card */}
+        <div className="bg-neutral-900 rounded-3xl border border-neutral-700 p-10 shadow-2xl">
+          <h2 className="text-4xl font-black text-white text-center mb-10 tracking-tight">
+            Create Account
+          </h2>
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
-            required
-          />
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div>
+              <label className="block text-neutral-400 text-sm mb-3">Username</label>
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full bg-neutral-950 border border-neutral-700 focus:border-orange-500 rounded-2xl px-6 py-5 text-white placeholder-neutral-500 focus:outline-none transition-all"
+                required
+              />
+            </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:border-emerald-500"
-            required
-          />
+            <div>
+              <label className="block text-neutral-400 text-sm mb-3">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="admin@sennelier.lk"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full bg-neutral-950 border border-neutral-700 focus:border-orange-500 rounded-2xl px-6 py-5 text-white placeholder-neutral-500 focus:outline-none transition-all"
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-md font-semibold disabled:opacity-70"
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
-          </button>
-        </form>
+            <div>
+              <label className="block text-neutral-400 text-sm mb-3">Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Create a strong password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full bg-neutral-950 border border-neutral-700 focus:border-orange-500 rounded-2xl px-6 py-5 text-white placeholder-neutral-500 focus:outline-none transition-all"
+                required
+              />
+            </div>
 
-        {message && <p className="text-center mt-4 text-sm font-medium text-green-600">{message}</p>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-700 text-black font-bold py-5 rounded-2xl text-lg transition-all duration-300 mt-2"
+            >
+              {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
+            </button>
+          </form>
 
-        <p className="text-center mt-6 text-sm text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="text-emerald-700 hover:underline">Log in</a>
+          {message && (
+            <p
+              className={`text-center mt-6 text-sm font-medium ${
+                message.includes("✅") ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {message}
+            </p>
+          )}
+
+          <div className="text-center mt-8">
+            <p className="text-neutral-500 text-sm">
+              Already have an account?{" "}
+              <a href="/login" className="text-orange-500 hover:underline font-medium">
+                Log in
+              </a>
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-neutral-500 text-xs mt-10">
+          © 2026 Motorhaus
         </p>
       </div>
     </div>

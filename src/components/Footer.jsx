@@ -9,8 +9,8 @@ export default function Footer() {
 
   const companyLinks = [
     { name: 'Contact', href: '/contact' },
-    { name: 'Careers', href: '#' },
-    { name: 'Press', href: '#' },
+    { name: 'Careers', href: '/careers' },
+    { name: 'Press', href: '/press' },
   ];
 
   return (

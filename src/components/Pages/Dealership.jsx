@@ -808,7 +808,7 @@ const Dealership = () => {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost/ART_CRAFT_DB/api/get_products.php");
+      const res = await fetch("http://localhost/Automative_DB/api/get_products.php");
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         const vehicleItems = data.data.filter(item => Number(item.category_id) === 1);
@@ -854,59 +854,7 @@ const Dealership = () => {
     <div className="bg-[#0B0D0F] min-h-screen text-white font-sans">
       
       {/* NAVIGATION */}
-      <nav className="relative z-30 bg-[#121416] text-[#E4E4E7] px-6 py-4 border-b border-gray-800/60">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3 select-none">
-            <div className="bg-gradient-to-br from-[#FF833E] to-[#FA541C] text-[#121416] font-black text-xl w-10 h-10 flex items-center justify-center rounded-lg shadow-md">
-              M
-            </div>
-            <span className="text-white font-extrabold tracking-wider text-xl uppercase font-mono">
-              Motorhaus
-            </span>
-          </div>
-
-          <div className="hidden md:flex items-center space-x-8 text-sm font-semibold tracking-wide">
-            <a href="#" className="text-[#9CA3AF] hover:text-white transition-colors">HOME</a>
-            <a href="#" className="text-[#FF833E]">DEALERSHIPS</a>
-            <a href="#" className="text-[#9CA3AF] hover:text-white transition-colors">PARTS</a>
-            <a href="#" className="text-[#9CA3AF] hover:text-white transition-colors">ACCESSORIES</a>
-            <a href="#" className="text-[#9CA3AF] hover:text-white transition-colors">CONTACT</a>
-          </div>
-
-          <div className="hidden md:block">
-            <button className="bg-gradient-to-r from-[#FF833E] to-[#FA541C] text-[#121416] font-bold text-sm px-6 py-3 rounded-lg shadow-lg hover:brightness-110 active:scale-95 transition-all duration-200 tracking-wide">
-              BOOK TEST DRIVE
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-400 hover:text-white"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 pt-4 border-t border-gray-800 space-y-3 px-6">
-            <a href="#" className="block py-2 text-[#9CA3AF]">HOME</a>
-            <a href="#" className="block py-2 text-[#FF833E]">DEALERSHIPS</a>
-            <a href="#" className="block py-2 text-[#9CA3AF]">PARTS</a>
-            <a href="#" className="block py-2 text-[#9CA3AF]">ACCESSORIES</a>
-            <a href="#" className="block py-2 text-[#9CA3AF]">CONTACT</a>
-            <button className="w-full bg-gradient-to-r from-[#FF833E] to-[#FA541C] text-[#121416] font-bold py-3 rounded-lg mt-4">
-              BOOK TEST DRIVE
-            </button>
-          </div>
-        )}
-      </nav>
-
+     
       {/* HERO SECTION */}
       <section className="relative flex flex-col justify-between overflow-hidden pt-20 md:pt-28 min-h-[85vh]">
         <div
@@ -993,7 +941,7 @@ const Dealership = () => {
                   <img
                     src={
                       vehicle.image_url
-                        ? `http://localhost/ART_CRAFT_DB/${vehicle.image_url}`
+                        ? `http://localhost/Automative_DB/${vehicle.image_url}`
                         : "https://via.placeholder.com/600x400?text=Vehicle"
                     }
                     alt={vehicle.name}
