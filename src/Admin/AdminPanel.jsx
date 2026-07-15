@@ -30,7 +30,7 @@ const AdminPanel = () => {
 
   const admin = {
     name: "Admin",
-    email: "admin@sennelier.lk",
+    email: "admin@sMotorhaus.lk",
     profilePic: "https://i.pravatar.cc/100?img=25",
   };
 
@@ -230,7 +230,7 @@ const AdminPanel = () => {
             <div>
               <h1 className="text-4xl font-black tracking-tight">{admin.name}</h1>
               <p className="text-neutral-400">{admin.email}</p>
-              <p className="text-orange-500 font-medium">Sennelier & Son — Admin Panel</p>
+              <p className="text-orange-500 font-medium"> Motorhaus — Admin Panel</p>
             </div>
           </div>
         </div>
